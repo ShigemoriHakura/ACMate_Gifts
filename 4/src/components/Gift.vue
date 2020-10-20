@@ -1,7 +1,7 @@
 <template>
   <div id="countdown">  
-    <div id='tiles' class="color-full">{{ item.count }}分钟</div>
-    <div class="countdown-label" id="countText">累计加钟</div>
+    <div id='tiles' class="color-full">{{hour}}:{{minute}}:{{second}}</div>
+    <div class="countdown-label" id="countText">直播倒计时！</div>
     <div class="countdown-label" id="posGift">一个{{ item.giftName }}加{{ item.target }}分钟</div>
   </div>
 </template>
@@ -17,6 +17,10 @@ export default {
   name: 'Gift',
   data() {
     return {
+      timestampEnd:0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
       item: [],
       websocket: null,
       retryCount: 0,
@@ -31,7 +35,49 @@ export default {
     this.isDestroying = true
     this.websocket.close()
   },
+  watch: {
+    second: {
+      handler () {
+      }
+    },
+    minute: {
+      handler () {
+      }
+    },
+    hour: {
+      handler () {
+      }
+    }
+  },
+  computed: {
+    second() {
+      return this.seconds
+    },
+    minute() {
+      return this.minutes
+    },
+    hour() {
+      return this.hours
+    }
+  },
   methods: {
+    refreshTimer(){
+      var lefttime = parseInt((this.timestampEnd - new Date().getTime()) / 1000)
+      if(lefttime > 0){
+        var h = parseInt(lefttime / (60 * 60) % 24)
+        var m = parseInt(lefttime / 60 % 60)
+        var s = parseInt(lefttime % 60)
+        h = this.addZero(h)
+        m = this.addZero(m)
+        s = this.addZero(s)
+        this.hours = h
+        this.minutes = m
+        this.seconds = s
+      }
+    },
+    addZero(i){
+      return i < 10 ? "0" + i: i + "";
+    },
     async processToken(){
       const url = `https://acmate.loli.ren/api/query?token=` + this.$route.params.token
       var data = (await axios.get(url)).data
@@ -40,10 +86,13 @@ export default {
           'giftAvatarUrl': data.data.giftAvatarUrl,
           'giftName': data.data.giftName,
           'count': 0,
-          'target': data.data.amount
+          'target': data.data.amount,
+          'time': data.data.time
         }
+        this.timestampEnd = new Date().getTime() + data.data.time * 1000 * 60 * 60
         this.config.roomId = data.data.roomID
         this.wsConnect()
+        window.setInterval(this.refreshTimer, 1 * 1000)
       }
     },
     wsConnect() {
@@ -88,7 +137,7 @@ export default {
       switch (cmd) {
         case COMMAND_ADD_GIFT:
           if(data.giftName === this.item.giftName){
-            this.item.count += data.num * this.item.target
+            this.timestampEnd += data.num * this.item.target * 60 * 1000
           }
           break
       }
