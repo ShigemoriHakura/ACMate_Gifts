@@ -88,13 +88,13 @@ export default {
         if(data.id != 0){
           switch (cmd) {
             case COMMAND_ADD_TEXT:
-              url = `https://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&spd=6&text=` + encodeURI(data.authorName + "说:" + data.content)
+              url = `https://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&spd=6&per=4&text=` + encodeURI(data.authorName + "说:" + data.content)
               u = new Audio(url)
               u.src = url
               u.play()
               break
             case COMMAND_ADD_GIFT:
-              url = `https://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&spd=6&text=` + encodeURI("感谢" + data.authorName + "送的" + data.num + "个" + data.giftName)
+              url = `https://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&spd=6&per=4&text=` + encodeURI("感谢" + data.authorName + "送的" + data.num + "个" + data.giftName)
               u = new Audio(url)
               u.src = url
               u.play()

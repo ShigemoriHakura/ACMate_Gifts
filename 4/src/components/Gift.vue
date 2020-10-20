@@ -63,7 +63,7 @@ export default {
   methods: {
     refreshTimer(){
       var lefttime = parseInt((this.timestampEnd - new Date().getTime()) / 1000)
-      if(lefttime > 0){
+      if(lefttime >= 0){
         var h = parseInt(lefttime / (60 * 60) % 24)
         var m = parseInt(lefttime / 60 % 60)
         var s = parseInt(lefttime % 60)
@@ -188,12 +188,12 @@ background: #f1f1f1;
 
 #countdown #tiles{
   color: #fff;
-    position: relative;
-    z-index: 1;
-text-shadow: 1px 1px 0px #ccc;
-    display: inline-block;
+  position: relative;
+  z-index: 1;
+  text-shadow: 1px 1px 0px #ccc;
+  display: inline-block;
   font-family: Arial, sans-serif;
-    text-align: center;
+  text-align: center;
   
   padding: 20px;
   border-radius: 5px 5px 0 0;
