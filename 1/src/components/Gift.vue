@@ -51,7 +51,6 @@ export default {
           'count': 0,
           'target': data.data.amount
         })
-        window.console.log(this.items)
         this.config.roomId = data.data.roomID
         this.wsConnect()
       }
