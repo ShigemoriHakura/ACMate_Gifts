@@ -40,6 +40,10 @@ export default {
       var data = (await axios.get(url)).data
       if(data.result == 1){
         this.config.roomId = data.data.roomID
+        this.config.speed = data.data.speed
+        this.config.pitch = data.data.pitch
+        this.config.volume = data.data.volume
+        this.config.person = data.data.person
         this.wsConnect()
       }
     },
@@ -88,13 +92,13 @@ export default {
         if(data.id != 0){
           switch (cmd) {
             case COMMAND_ADD_TEXT:
-              url = `https://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&spd=6&per=4&text=` + encodeURI(data.authorName + "说:" + data.content)
+              url = `https://tts.baidu.com/text2audio?lan=ZH&cuid=baike&pdt=301&ctp=1&spd=` + this.config.speed + `&per=` + this.config.person + `&vol=` + this.config.volume + `&pit=` + this.config.pitch + `&tex=` + encodeURI(data.authorName + "说:" + data.content)
               u = new Audio(url)
               u.src = url
               u.play()
               break
             case COMMAND_ADD_GIFT:
-              url = `https://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&spd=6&per=4&text=` + encodeURI("感谢" + data.authorName + "送的" + data.num + "个" + data.giftName)
+              url = `https://tts.baidu.com/text2audio?lan=ZH&cuid=baike&pdt=301&ctp=1&spd=` + this.config.speed + `&per=` + this.config.person + `&vol=` + this.config.volume + `&pit=` + this.config.pitch + `&tex=` + encodeURI("感谢" + data.authorName + "送的" + data.num + "个" + data.giftName)
               u = new Audio(url)
               u.src = url
               u.play()

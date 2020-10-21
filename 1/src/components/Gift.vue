@@ -45,12 +45,15 @@ export default {
       const url = `https://acmate.loli.ren/api/query?token=` + this.$route.params.token
       var data = (await axios.get(url)).data
       if(data.result == 1){
-        this.items.unshift({
-          'giftAvatarUrl': data.data.giftAvatarUrl,
-          'giftName': data.data.giftName,
-          'count': 0,
-          'target': data.data.amount
-        })
+        for (let i = 0; i < data.data.gifts.length; i++) {
+          const element = data.data.gifts[i];
+          this.items.unshift({
+            'count': 0,
+            'giftAvatarUrl': element.gift_icon,
+            'giftName': element.gift_name,
+            'target': element.gift_amount
+          })
+        }
         this.config.roomId = data.data.roomID
         this.wsConnect()
       }
