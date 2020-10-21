@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button v-on:click="startMessage">Start</button>
+    <button v-on:click="startMessage" v-if="!play">Start</button>
     <p v-if="play">开始</p>
   </div>
 </template>
@@ -22,6 +22,7 @@ export default {
       retryCount: 0,
       isDestroying: false,
       config: {},
+      urlQueue: [],
     }
   },
   created() {
@@ -45,6 +46,7 @@ export default {
         this.config.volume = data.data.volume
         this.config.person = data.data.person
         this.wsConnect()
+        this.processQueue()
       }
     },
     wsConnect() {
@@ -88,23 +90,36 @@ export default {
       if(this.play){
         let {cmd, data} = JSON.parse(event.data)
         var url
-        var u
         if(data.id != 0){
           switch (cmd) {
             case COMMAND_ADD_TEXT:
               url = `https://tts.baidu.com/text2audio?lan=ZH&cuid=baike&pdt=301&ctp=1&spd=` + this.config.speed + `&per=` + this.config.person + `&vol=` + this.config.volume + `&pit=` + this.config.pitch + `&tex=` + encodeURI(data.authorName + "说:" + data.content)
-              u = new Audio(url)
-              u.src = url
-              u.play()
+              this.urlQueue.push(url)
               break
             case COMMAND_ADD_GIFT:
               url = `https://tts.baidu.com/text2audio?lan=ZH&cuid=baike&pdt=301&ctp=1&spd=` + this.config.speed + `&per=` + this.config.person + `&vol=` + this.config.volume + `&pit=` + this.config.pitch + `&tex=` + encodeURI("感谢" + data.authorName + "送的" + data.num + "个" + data.giftName)
-              u = new Audio(url)
-              u.src = url
-              u.play()
+              this.urlQueue.push(url)
               break
           }
         }
+      }
+    },
+    processQueue(){
+      if(this.urlTimer != null){
+        window.clearInterval(this.urlTimer);
+      }
+      if(this.urlQueue.length > 0){
+        var url = this.urlQueue.splice(0, 1)
+        var u = new Audio(url)
+        u.src = url
+        u.addEventListener('play',()=>{
+            setTimeout(()=>{
+              this.urlTimer = window.setInterval(this.processQueue, u.duration * 1000)
+            }, 800)
+        });
+        u.play()
+      }else{
+        this.urlTimer = window.setInterval(this.processQueue, 0.5 * 1000)
       }
     }
   }
