@@ -41,10 +41,11 @@ export default {
       var data = (await axios.get(url)).data
       if(data.result == 1){
         this.config.roomId = data.data.roomID
-        this.config.speed = data.data.speed
-        this.config.pitch = data.data.pitch
+        this.config.speed  = data.data.speed
+        this.config.pitch  = data.data.pitch
         this.config.volume = data.data.volume
         this.config.person = data.data.person
+        this.config.gift   = data.data.gift
         this.wsConnect()
         this.processQueue()
       }
@@ -97,8 +98,10 @@ export default {
               this.urlQueue.push(url)
               break
             case COMMAND_ADD_GIFT:
-              url = `https://tts.baidu.com/text2audio?lan=ZH&cuid=baike&pdt=301&ctp=1&spd=` + this.config.speed + `&per=` + this.config.person + `&vol=` + this.config.volume + `&pit=` + this.config.pitch + `&tex=` + encodeURI("感谢" + data.authorName + "送的" + data.num + "个" + data.giftName)
-              this.urlQueue.push(url)
+              if(this.config.gift){
+                url = `https://tts.baidu.com/text2audio?lan=ZH&cuid=baike&pdt=301&ctp=1&spd=` + this.config.speed + `&per=` + this.config.person + `&vol=` + this.config.volume + `&pit=` + this.config.pitch + `&tex=` + encodeURI("感谢" + data.authorName + "送的" + data.num + "个" + data.giftName)
+                this.urlQueue.push(url)
+              }
               break
           }
         }
