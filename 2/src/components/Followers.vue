@@ -40,8 +40,12 @@ export default {
       const url = `https://acmate.loli.ren/api/query?token=` + this.$route.params.token
       var data = (await axios.get(url)).data
       if(data.result == 1){
+        var followers = data.data.text
+        if(followers == ""){
+          followers = "关注者"
+        }
         this.items.unshift({
-          'giftName': "关注者",
+          'giftName': followers,
           'count': 0,
           'target': data.data.amount
         })
