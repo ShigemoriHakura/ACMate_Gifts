@@ -263,7 +263,8 @@ export default {
             if(this.started){
               if (data.content.indexOf(this.drawText) === 0) {
                 var keyword = data.content.split(" ").slice(1).join(" ");
-                this.pushToDanmaku(data.authorName, data.id, keyword)
+                var name = data.authorName.replace(/\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F]/g, "");
+                this.pushToDanmaku(name, data.id, keyword)
               }
             }
             break
