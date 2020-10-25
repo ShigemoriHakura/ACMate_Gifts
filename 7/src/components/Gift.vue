@@ -12,23 +12,6 @@
 
     <v-main>
       <v-container>
-        <v-dialog v-model="copied" width="500">
-
-          <v-card>
-            <v-card-title class="headline grey lighten-2">
-              复制成功
-            </v-card-title>
-
-            <v-divider></v-divider>
-
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="primary" text @click="copied = false">
-                了解
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
         <v-row>
           <v-col cols="12" md="2">
             <v-chip>弹幕监听状态: {{getStatus}}</v-chip>
@@ -111,7 +94,6 @@ export default {
   name: 'Gift',
   data() {
     return {
-      copied :false,
       text: "",
       started: true,
       danmaku: [],
@@ -149,23 +131,17 @@ export default {
       }else{
         for (let i = 0; i < data.data.length; i++) {
           const element = data.data[i];
-          let result = this.danmaku.find(c => Number(c.id) === element.id);
-          if(result){
-            if(result.done !== element.done){
-              if(element.done == 0){
-                //什么玩意？？？
-              }else{
-                this.danmaku.splice(result, 1)
-              }
-            }
-          }else{
-            if(element.done == 0){
+          if(element.done == 0){
+            let result = this.danmaku.find(c => Number(c.id) === element.id)
+            if(!result){
               this.danmaku.push(element)
             }else{
-              let result1 = this.danmakuDoneSong.find(c => Number(c.id) === element.id);
-              if(!result1){
-                this.danmakuDoneSong.push(element)
-              }
+              result.sender_num = element.sender_num
+            }
+          }else{
+            let result1 = this.danmakuDoneSong.find(c => Number(c.id) === element.id);
+            if(!result1){
+              this.danmakuDoneSong.push(element)
             }
           }
         }
@@ -173,13 +149,13 @@ export default {
           const element = this.danmaku[i];
           let result = data.data.find(c => Number(c.id) === element.id);
           if(!result){
-            this.danmaku.splice(element, 1)
+            this.danmaku.splice(i, 1)
           }
         }
       }
     },
     onCopy: function () {
-      this.copied = true
+      this.$notify.toast("复制成功！")
     },
     async cleanTable(){
       const url = `https://acmate.loli.ren/api/song/?token=` + this.$route.params.token + "&action=clear"
@@ -264,7 +240,8 @@ export default {
               if (data.content.indexOf(this.drawText) === 0) {
                 var keyword = data.content.split(" ").slice(1).join(" ");
                 if(keyword != ""){
-                  var name = data.authorName.replace(/\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F]/g, "");
+                  var pattern = /[\w\u4e00-\u9fcc]+/;
+                  var name = data.authorName.match(pattern);
                   this.pushToDanmaku(name, data.id, keyword)
                 }
               }
