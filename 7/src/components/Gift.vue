@@ -31,7 +31,7 @@
         </v-dialog>
         <v-row>
           <v-col cols="12" md="2">
-            <v-chip>弹幕监听状态: {{started.toString()}}</v-chip>
+            <v-chip>弹幕监听状态: {{getStatus}}</v-chip>
             <v-chip>发送弹幕格式: {{drawText}} 歌名</v-chip>
             <v-text-field v-model="drawText" label="点歌指令"></v-text-field>
             <v-btn elevation="2" color="primary" @click="started = true">开始</v-btn>
@@ -130,6 +130,14 @@ export default {
   beforeDestroy() {
     this.isDestroying = true
     this.websocket.close()
+  },
+  computed: {
+    getStatus() {
+      if(this.started){
+        return "已开始"
+      }
+      return "已停止"
+    }
   },
   methods: {
     onCopy: function () {

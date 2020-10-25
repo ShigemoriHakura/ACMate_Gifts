@@ -14,11 +14,11 @@
       <v-container>
         <v-row>
           <v-col cols="12" md="4">
-            <v-chip>弹幕监听状态: {{started.toString()}}</v-chip>
+            <v-chip>弹幕监听状态: {{getStatus}}</v-chip>
             <v-text-field v-model="drawText" label="抽奖文本"></v-text-field>
             <v-text-field v-model="drawAmount" type="number" label="抽奖个数"></v-text-field>
             <v-select v-model="drawText" :items="gifts" label="礼物" item-text="gift_name" item-value="gift_name"></v-select>
-            <v-switch v-model="isGift" :label="`是否是礼物: ${isGift.toString()}`"></v-switch>
+            <v-switch v-model="isGift" :label="`参与抽奖方式: ${getIsGiftStatus}`"></v-switch>
             <v-btn elevation="2" color="primary" @click="started = true">开始</v-btn>
             <v-btn elevation="2" color="error" @click="started = false">结束</v-btn>
             <v-btn elevation="2" @click="getResult">抽奖</v-btn>
@@ -115,6 +115,20 @@ export default {
   beforeDestroy() {
     this.isDestroying = true
     this.websocket.close()
+  },
+  computed: {
+    getStatus() {
+      if(this.started){
+        return "已开始"
+      }
+      return "已停止"
+    },
+    getIsGiftStatus() {
+      if(this.isGift){
+        return "赠送礼物"
+      }
+      return "发送弹幕"
+    }
   },
   methods: {
     getResult(){
