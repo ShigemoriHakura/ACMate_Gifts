@@ -58,14 +58,14 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="item in danmaku" :key="item.iid">
-                    <td>{{ item.name }}</td>
-                    <td>{{ item.num }}</td>
-                    <td>{{ item.danmaku }}</td>
+                  <tr v-for="item in danmaku" :key="item.id">
+                    <td>{{ item.sender_name }}</td>
+                    <td>{{ item.sender_num }}</td>
+                    <td>{{ item.song }}</td>
                     <td>
-                      <v-btn elevation="2" color="primary" @click="moveSong(item.danmaku)">已唱</v-btn>
-                      <v-btn elevation="2" color="primary" v-clipboard:copy="item.danmaku" v-clipboard:success="onCopy">复制</v-btn>
-                      <v-btn elevation="2" color="error" @click="deleteSong(item.danmaku)">删除</v-btn>
+                      <v-btn elevation="2" color="primary" @click="moveSong(item.song)">已唱</v-btn>
+                      <v-btn elevation="2" color="primary" v-clipboard:copy="item.song" v-clipboard:success="onCopy">复制</v-btn>
+                      <v-btn elevation="2" color="error" @click="deleteSong(item.song)">删除</v-btn>
                     </td>
                   </tr>
                   </tbody>
@@ -86,9 +86,9 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="item in danmakuDoneSong" :key="item.iid">
-                    <td>{{ item.danmaku }}</td>
-                    <td>{{ item.name }}</td>
+                  <tr v-for="item in danmakuDoneSong" :key="item.id">
+                    <td>{{ item.song }}</td>
+                    <td>{{ item.sender_name }}</td>
                   </tr>
                   </tbody>
               </template>
@@ -140,33 +140,72 @@ export default {
     }
   },
   methods: {
-    onCopy: function () {
-      this.copied = true
-    },
-    getResult(){
-      this.started = false
-      this.danmakuDrawed = this.makeRandomArr(this.danmaku, this.drawAmount)
-    },
-    cleanTable(){
-      this.danmaku = []
-      this.danmakuDrawed = []
-    },
-    moveSong(songName){
-      for (let i = 0; i < this.danmaku.length; i++) {
-        const element = this.danmaku[i];
-        if(element.danmaku === songName){
-          var arr = this.danmaku[i];
-          this.danmaku.splice(i, 1)
-          this.danmakuDoneSong.push(arr)
+    async fetchSongs(){
+      const url = `https://acmate.loli.ren/api/song/?token=` + this.$route.params.token + "&action=show"
+      var data = (await axios.get(url)).data
+      if(data.data.length == 0){
+        this.danmaku = []
+        this.danmakuDoneSong = []
+      }else{
+        for (let i = 0; i < data.data.length; i++) {
+          const element = data.data[i];
+          let result = this.danmaku.find(c => Number(c.id) === element.id);
+          if(result){
+            if(result.done !== element.done){
+              if(element.done == 0){
+                //什么玩意？？？
+              }else{
+                this.danmaku.splice(result, 1)
+              }
+            }
+          }else{
+            if(element.done == 0){
+              this.danmaku.push(element)
+            }else{
+              let result1 = this.danmakuDoneSong.find(c => Number(c.id) === element.id);
+              if(!result1){
+                this.danmakuDoneSong.push(element)
+              }
+            }
+          }
+        }
+        for (let i = 0; i < this.danmaku.length; i++) {
+          const element = this.danmaku[i];
+          let result = data.data.find(c => Number(c.id) === element.id);
+          if(!result){
+            this.danmaku.splice(element, 1)
+          }
         }
       }
     },
-    deleteSong(songName){
-      for (let i = 0; i < this.danmaku.length; i++) {
-        const element = this.danmaku[i];
-        if(element.danmaku === songName){
-          this.danmaku.splice(i, 1)
-        }
+    onCopy: function () {
+      this.copied = true
+    },
+    async cleanTable(){
+      const url = `https://acmate.loli.ren/api/song/?token=` + this.$route.params.token + "&action=clear"
+      var data = (await axios.get(url)).data
+      if(data.result == true){
+        this.$notify.toast("成功！")
+      }else{
+        this.$notify.toast("失败！")
+      }
+    },
+    async moveSong(songName){
+      const url = `https://acmate.loli.ren/api/song/?token=` + this.$route.params.token + "&action=done&song=" + songName
+      var data = (await axios.get(url)).data
+      if(data.result == true){
+        this.$notify.toast("成功！")
+      }else{
+        this.$notify.toast("失败！")
+      }
+    },
+    async deleteSong(songName){
+      const url = `https://acmate.loli.ren/api/song/?token=` + this.$route.params.token + "&action=del&song=" + songName
+      var data = (await axios.get(url)).data
+      if(data.result == true){
+        this.$notify.toast("成功！")
+      }else{
+        this.$notify.toast("失败！")
       }
     },
     async processToken(){
@@ -176,6 +215,7 @@ export default {
         this.text = data.data.text
         this.config.roomId = data.data.roomID
         this.wsConnect()
+        window.setInterval(this.fetchSongs, 0.5 * 1000)
       }
     },
     wsConnect() {
@@ -223,31 +263,20 @@ export default {
             if(this.started){
               if (data.content.indexOf(this.drawText) === 0) {
                 var keyword = data.content.split(" ").slice(1).join(" ");
-                this.pushToDanmaku(data.authorName, 1, data.id, keyword)
+                this.pushToDanmaku(data.authorName, data.id, keyword)
               }
             }
             break
         }
       }
     },
-    pushToDanmaku(name, num, id, danmaku){
-      var added = false;
-      for (let i = 0; i < this.danmaku.length; i++) {
-        const element = this.danmaku[i];
-        if(element.danmaku === danmaku){
-          this.danmaku[i].num += num
-          added = true
-        }
-      }
-      if(!added){
-        this.danmakuSongLength ++
-        this.danmaku.push({
-          "iid" : this.danmakuSongLength,
-          "name" : name,
-          "num" : num,
-          "id" : id,
-          "danmaku" : danmaku,
-        })
+    async pushToDanmaku(name, id, song){
+      const url = `https://acmate.loli.ren/api/song/?token=` + this.$route.params.token + "&action=add&song=" + song + "&sender=" + name + "&senderid=" + id
+      var data = (await axios.get(url)).data
+      if(data.result == true){
+        this.$notify.toast("用户" + name + "点歌：" + song)
+      }else{
+        this.$notify.toast("失败！")
       }
     }
   }
