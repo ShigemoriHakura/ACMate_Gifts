@@ -95,23 +95,17 @@ export default {
       }else{
         for (let i = 0; i < data.data.length; i++) {
           const element = data.data[i];
-          let result = this.danmaku.find(c => Number(c.id) === element.id);
-          if(result){
-            if(result.done !== element.done){
-              if(element.done == 0){
-                //什么玩意？？？
-              }else{
-                this.danmaku.splice(result, 1)
-              }
-            }
-          }else{
-            if(element.done == 0){
+          if(element.done == 0){
+            let result = this.danmaku.find(c => Number(c.id) === element.id)
+            if(!result){
               this.danmaku.push(element)
             }else{
-              let result1 = this.danmakuDoneSong.find(c => Number(c.id) === element.id);
-              if(!result1){
-                this.danmakuDoneSong.push(element)
-              }
+              result.sender_num = element.sender_num
+            }
+          }else{
+            let result1 = this.danmakuDoneSong.find(c => Number(c.id) === element.id);
+            if(!result1){
+              this.danmakuDoneSong.push(element)
             }
           }
         }
@@ -119,7 +113,11 @@ export default {
           const element = this.danmaku[i];
           let result = data.data.find(c => Number(c.id) === element.id);
           if(!result){
-            this.danmaku.splice(element, 1)
+            this.danmaku.splice(i, 1)
+          }else{
+            if(result.done == 1){
+              this.danmaku.splice(i, 1)
+            }
           }
         }
       }
