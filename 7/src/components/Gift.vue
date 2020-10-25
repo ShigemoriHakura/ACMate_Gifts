@@ -150,6 +150,10 @@ export default {
           let result = data.data.find(c => Number(c.id) === element.id);
           if(!result){
             this.danmaku.splice(i, 1)
+          }else{
+            if(result.done == 1){
+              this.danmaku.splice(i, 1)
+            }
           }
         }
       }
