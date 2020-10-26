@@ -19,10 +19,10 @@
             <v-text-field v-model="drawAmount" type="number" label="抽奖个数"></v-text-field>
             <v-select v-model="drawText" :items="gifts" label="礼物" item-text="gift_name" item-value="gift_name"></v-select>
             <v-switch v-model="isGift" :label="`参与抽奖方式: ${getIsGiftStatus}`"></v-switch>
-            <v-btn elevation="2" color="primary" @click="started = true">开始</v-btn>
-            <v-btn elevation="2" color="error" @click="started = false">结束</v-btn>
-            <v-btn elevation="2" @click="getResult">抽奖</v-btn>
-            <v-btn elevation="2" @click="cleanTable">清除</v-btn>
+            <v-btn class="ma-2" elevation="2" color="primary" @click="started = true">开始</v-btn>
+            <v-btn class="ma-2" elevation="2" color="error" @click="started = false">结束</v-btn>
+            <v-btn class="ma-2" elevation="2" color="warning" @click="getResult">抽奖</v-btn>
+            <v-btn class="ma-2" elevation="2" @click="cleanTable">清空</v-btn>
           </v-col>
           <v-col cols="12" md="5">
             <v-simple-table>
