@@ -120,6 +120,13 @@ export default {
             }
           }
         }
+        for (let i = 0; i < this.danmakuDoneSong.length; i++) {
+          const element = this.danmakuDoneSong[i];
+          let result = data.data.find(c => Number(c.id) === element.id);
+          if(!result){
+            this.danmakuDoneSong.splice(i, 1)
+          }
+        }
       }
     },
     async processToken(){

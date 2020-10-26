@@ -13,15 +13,18 @@
     <v-main>
       <v-container>
         <v-row>
-          <v-col cols="12" md="2">
+          <v-col cols="12" md="12">
             <v-chip>弹幕监听状态: {{getStatus}}</v-chip>
             <v-chip>发送弹幕格式: {{drawText}} 歌名</v-chip>
+            <br><br>
             <v-text-field v-model="drawText" label="点歌指令"></v-text-field>
-            <v-btn elevation="2" color="primary" @click="started = true">开始</v-btn>
-            <v-btn elevation="2" color="error" @click="started = false">结束</v-btn>
-            <v-btn elevation="2" @click="cleanTable">清除</v-btn>
+            <v-btn class="ma-2" elevation="2" color="primary" @click="started = true">开始</v-btn>
+            <v-btn class="ma-2" elevation="2" color="error" @click="started = false">结束</v-btn>
+            <v-btn class="ma-2" elevation="2" @click="cleanTable">清空歌曲</v-btn>
           </v-col>
-          <v-col cols="12" md="7">
+        </v-row>
+        <v-row>
+          <v-col cols="12" md="8">
             <v-simple-table>
               <template v-slot:default>
                 <thead>
@@ -46,16 +49,17 @@
                     <td>{{ item.sender_num }}</td>
                     <td>{{ item.song }}</td>
                     <td>
-                      <v-btn elevation="2" color="primary" @click="moveSong(item.song)">已唱</v-btn>
-                      <v-btn elevation="2" color="primary" v-clipboard:copy="item.song" v-clipboard:success="onCopy">复制</v-btn>
-                      <v-btn elevation="2" color="error" @click="deleteSong(item.song)">删除</v-btn>
+                      <v-btn class="ma-2" elevation="2" color="primary" @click="moveSong(item.song)">已唱</v-btn>
+                      <v-btn class="ma-2" elevation="2" color="primary" @click="searchSong(item.song)">搜索</v-btn>
+                      <v-btn class="ma-2" elevation="2" color="primary" v-clipboard:copy="item.song" v-clipboard:success="onCopy">复制</v-btn>
+                      <v-btn class="ma-2" elevation="2" color="error" @click="deleteSong(item.song)">删除</v-btn>
                     </td>
                   </tr>
                   </tbody>
               </template>
             </v-simple-table>
           </v-col>
-          <v-col cols="12" md="3">
+          <v-col cols="12" md="4">
             <v-simple-table>
               <template v-slot:default>
                 <thead>
@@ -66,12 +70,18 @@
                     <th class="text-left">
                       点歌人
                     </th>
+                    <th class="text-left">
+                      操作
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="item in danmakuDoneSong" :key="item.id">
                     <td>{{ item.song }}</td>
                     <td>{{ item.sender_name }}</td>
+                    <td>
+                      <v-btn elevation="2" color="error" @click="deleteSong(item.song)">删除</v-btn>
+                    </td>
                   </tr>
                   </tbody>
               </template>
@@ -95,9 +105,10 @@ export default {
   data() {
     return {
       text: "",
+      drawText: "点歌",
       started: true,
       danmaku: [],
-      drawText: "点歌",
+      songName: "",
       danmakuSongLength: 0,
       danmakuDoneSong :[],
       websocket: null,
@@ -122,6 +133,9 @@ export default {
     }
   },
   methods: {
+    searchSong(songName){
+      window.open('https://music.163.com/#/search/m/?s=' + songName + '&type=1', '_blank');
+    },
     async fetchSongs(){
       const url = `https://acmate.loli.ren/api/song/?token=` + this.$route.params.token + "&action=show"
       var data = (await axios.get(url)).data
@@ -154,6 +168,13 @@ export default {
             if(result.done == 1){
               this.danmaku.splice(i, 1)
             }
+          }
+        }
+        for (let i = 0; i < this.danmakuDoneSong.length; i++) {
+          const element = this.danmakuDoneSong[i];
+          let result = data.data.find(c => Number(c.id) === element.id);
+          if(!result){
+            this.danmakuDoneSong.splice(i, 1)
           }
         }
       }
@@ -244,9 +265,7 @@ export default {
               if (data.content.indexOf(this.drawText) === 0) {
                 var keyword = data.content.split(" ").slice(1).join(" ");
                 if(keyword != ""){
-                  var pattern = /[\w\u4e00-\u9fcc]+/;
-                  var name = data.authorName.match(pattern);
-                  this.pushToDanmaku(name, data.id, keyword)
+                  this.pushToDanmaku(data.authorName, data.id, keyword)
                 }
               }
             }
