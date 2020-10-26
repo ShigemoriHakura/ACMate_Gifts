@@ -3,8 +3,8 @@
     <v-main>
       <v-container>
         <v-row>
-          <v-col cols="12" md="6">
-            <v-simple-table>
+          <v-col cols="12" md="6" sm="0" xs="0" class="d-none d-md-flex d-lg-flex">
+            <v-simple-table style="width: 100%;">
               <template v-slot:default>
                 <thead>
                   <tr>
@@ -18,14 +18,14 @@
                 </thead>
                 <tbody>
                   <tr v-for="item in danmaku" :key="item.id">
-                    <td>{{ item.sender_name }}</td>
-                    <td>{{ item.song }}</td>
+                    <td style="font-size: 18px !important;font-weight: 800;">{{ item.sender_name }}</td>
+                    <td style="font-size: 18px !important;font-weight: 800;">{{ item.song }}</td>
                   </tr>
                   </tbody>
               </template>
             </v-simple-table>
           </v-col>
-          <v-col cols="12" md="6">
+          <v-col cols="12" md="6" sm="12" xs="12">
             <v-simple-table>
               <template v-slot:default>
                 <thead>
@@ -40,8 +40,8 @@
                 </thead>
                 <tbody>
                   <tr v-for="item in danmakuDoneSong" :key="item.id">
-                    <td>{{ item.song }}</td>
-                    <td>{{ item.sender_name }}</td>
+                    <td style="font-size: 18px !important;font-weight: 800;">{{ item.song }}</td>
+                    <td style="font-size: 18px !important;font-weight: 800;">{{ item.sender_name }}</td>
                   </tr>
                   </tbody>
               </template>
