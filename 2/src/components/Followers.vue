@@ -105,7 +105,7 @@ body {
 
 .icon {
   height: 80px;
-  weight: 80px;
+  width: 80px;
   margin: 0.1rem;
   display: flex;
   justify-content: center;
@@ -129,7 +129,6 @@ body {
   position: relative;
   z-index: 5;
  
-  //box-shadow: 0 0.3125rem 1.0625rem rgba(40, 40, 40, 0.5), 0 0 3px 1px rgba(40, 40, 40, 0.5) inset;
   height: 1.5rem;
  
   
