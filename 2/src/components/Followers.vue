@@ -3,10 +3,10 @@
     <div class="task" v-for="item in items" v-bind:key="item.giftName">
       <div class="progress warm"  >
         <div class="progress-name"> {{ item.giftName }}</div>
-        <div class="progress-text" v-if="item.count <= item.target"> ({{ item.count }}/{{item.target}})</div>
-        <div class="progress-text" v-else-if="finishedAction"> ({{ item.count }}/{{item.target}})</div>
+        <div class="progress-text" v-if="item.count <= item.target"> {{ item.count }}/{{item.target}}</div>
+        <div class="progress-text" v-else-if="finishedAction"> {{ item.count }}/{{item.target}}</div>
 
-        <div class="progress-text" v-else  > (已完成{{item.target}})</div>
+        <div class="progress-text" v-else  > 已完成{{item.target}}</div>
 
         <div class="progress-bar" :style="item.barStyle" style="width: 0%"></div>
       </div>
